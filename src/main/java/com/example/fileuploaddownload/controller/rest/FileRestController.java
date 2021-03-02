@@ -1,4 +1,4 @@
-package com.example.fileuploaddownload.controller;
+package com.example.fileuploaddownload.controller.rest;
 
 import com.example.fileuploaddownload.model.DataBaseFile;
 import com.example.fileuploaddownload.payload.Response;
@@ -11,7 +11,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
@@ -19,7 +18,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/file")
+@RequestMapping("/api/files")
 public class FileRestController {
 
     private FileService fileService;
@@ -29,24 +28,17 @@ public class FileRestController {
         this.fileService = fileService;
     }
 
-    @PostMapping("/uploadFile")
-    public Response uploadFile(@RequestParam("file") MultipartFile file) {
-        DataBaseFile dataBaseFile = fileService.saveFile(file);
-
-        String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/downloadFile/")
-                .path(dataBaseFile.getId().toString())
-                .toUriString();
-
-        return new Response(dataBaseFile.getFileName(), fileDownloadUri, file.getContentType(), file.getSize());
-    }
-
-    @PostMapping("/uploadMultipleFiles")
+    @PostMapping()
     public List<Response> uploadMultipleFiles(@RequestParam("files") MultipartFile[] files) {
-        return Arrays.asList(files).stream().map(file -> uploadFile(file)).collect(Collectors.toList());
+        return Arrays.asList(files).stream().map(file -> fileService.uploadFile(file)).collect(Collectors.toList());
     }
 
-    @GetMapping("downloadFile/{fileId}")
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<Response> getAllDataBaseFiles() {
+        return fileService.getAllFilesList();
+    }
+
+    @GetMapping(path = "/{fileId}")
     public ResponseEntity<Resource> downloadFile(@PathVariable Long fileId, HttpServletRequest request) {
 
         DataBaseFile dataBaseFile = fileService.getFile(fileId);
@@ -55,5 +47,10 @@ public class FileRestController {
                 .contentType(MediaType.parseMediaType(dataBaseFile.getFileType()))
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + dataBaseFile.getFileName() + "\"")
                 .body(new ByteArrayResource(dataBaseFile.getData()));
+    }
+
+    @DeleteMapping("/{fileId}")
+    public void deleteFile(@PathVariable Long fileId) {
+        fileService.deleteFile(fileId);
     }
 }

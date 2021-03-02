@@ -3,7 +3,7 @@ package com.example.fileuploaddownload.payload;
 import java.util.Objects;
 
 public class Response {
-
+    private Long id;
     private String fileName;
     private String fileDownloadUri;
     private String fileType;
@@ -14,6 +14,22 @@ public class Response {
         this.fileDownloadUri = fileDownloadUri;
         this.fileType = fileType;
         this.size = size;
+    }
+
+    public Response(Long id, String fileName, String fileDownloadUri, String fileType, long size) {
+        this.id = id;
+        this.fileName = fileName;
+        this.fileDownloadUri = fileDownloadUri;
+        this.fileType = fileType;
+        this.size = size;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getFileName() {
@@ -54,6 +70,7 @@ public class Response {
         if (!(o instanceof Response)) return false;
         Response response = (Response) o;
         return size == response.size &&
+                Objects.equals(id, response.id) &&
                 Objects.equals(fileName, response.fileName) &&
                 Objects.equals(fileDownloadUri, response.fileDownloadUri) &&
                 Objects.equals(fileType, response.fileType);
@@ -61,13 +78,14 @@ public class Response {
 
     @Override
     public int hashCode() {
-        return Objects.hash(fileName, fileDownloadUri, fileType, size);
+        return Objects.hash(id, fileName, fileDownloadUri, fileType, size);
     }
 
     @Override
     public String toString() {
         return "Response{" +
-                "fileName='" + fileName + '\'' +
+                "id=" + id +
+                ", fileName='" + fileName + '\'' +
                 ", fileDownloadUri='" + fileDownloadUri + '\'' +
                 ", fileType='" + fileType + '\'' +
                 ", size=" + size +

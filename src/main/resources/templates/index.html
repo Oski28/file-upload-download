@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File-upload-download</title>
+</head>
+<body>
+<div>
+    <h1>Add file(s):</h1>
+    <form method="post" enctype="multipart/form-data" action="/">
+        <input type="file" multiple="multiple" name="files">
+        <button type="submit">Add file(s)</button>
+    </form>
+</div>
+<div>
+    <h1>File list:</h1>
+    <ul>
+        <li th:each="file,i : ${files}" th:object="${file}">
+            <span th:text="${i.index + 1}"></span>
+            <span th:text="*{fileName}"></span> <br>
+            Type : <span th:text="*{fileType}"></span> <br>
+            <a th:href="*{fileDownloadUri}">Download file</a>
+            <form th:action="@{/{id} (id = ${file.id})}" th:method="delete">
+                <button type="submit">
+                    Delete file from database
+                </button>
+            </form>
+            <br>
+            <br>
+        </li>
+    </ul>
+</div>
+</body>
+</html>
